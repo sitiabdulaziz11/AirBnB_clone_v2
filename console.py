@@ -126,7 +126,7 @@ class HBNBCommand(cmd.Cmd):
         class_name = comm_args[1]
 
         try:
-            obj_class = globals[class_name]
+            obj_class = globals()[class_name]
         except KeyError:
             print("** class doesn't exist **")
             return
