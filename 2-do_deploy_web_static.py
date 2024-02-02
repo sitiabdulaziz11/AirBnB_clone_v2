@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """
 Fabric script (based on the file 1-pack_web_static.py)
-that distributes an archive to your web servers, using
+that distributes an archive to my web servers, using
 the function do_deploy:
 """
 
@@ -12,35 +12,36 @@ from fabric.api import env, local, put, run, runs_once
 env.hosts = ['54.87.172.4, 100.26.209.47']
 
 
-@runs_once
 def do_pack():
-    """Archives the static files."""
-    if not os.path.isdir("versions"):
-        os.mkdir("versions")
-    cur_time = datetime.now()
-    output = "versions/web_static_{}{}{}{}{}{}.tgz".format(
-        cur_time.year,
-        cur_time.month,
-        cur_time.day,
-        cur_time.hour,
-        cur_time.minute,
-        cur_time.second
-    )
+    """
+    Make .tgz archive or compressed file on web_static folder.
+    """
+    if not os.path.exists("versions"):
+        local("mkdir versions")
+    present_time = datetime.now()
+    result = "versions/web_static_{}{}{}{}{}{}.tgz".format(
+            present_time.year,
+            present_time.month,
+            present_time.day,
+            present_time.hour,
+            present_time.minute,
+            present_time.second
+            )
     try:
-        print("Packing web_static to {}".format(output))
-        local("tar -cvzf {} web_static".format(output))
-        archize_size = os.stat(output).st_size
-        print("web_static packed: {} -> {} Bytes".format(output, archize_size))
+        print("Packing web_static to {}".format(result))
+        local("tar -cvzf {} web_static".format(result))
+        arch_size = os.stat(result).st_size
+        print("web_static packed: {} -> {} Bytes".format(result, arch_size))
     except Exception:
-        output = None
-    return output
+        result = None
+    return result
 
 
 def do_deploy(archive_path):
-    """Deploys the static files to the host servers.
-    Args:
-        archive_path (str): The path to the archived static files.
+    """Fabric script that distributes an archive to my
+    web servers using the do_deploy function
     """
+
     if not os.path.exists(archive_path):
         return False
     file_name = os.path.basename(archive_path)
