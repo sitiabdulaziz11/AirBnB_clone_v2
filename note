@@ -1,3 +1,5 @@
+:{getenv('HBNB_MYSQL_PORT')}/
+
 /dev/null:
 
 /dev/null is a special file that discards all data written to it. It acts like a "black hole" for data.
@@ -45,3 +47,53 @@ CREATE DATABASE Airbnb;
 
 
 
+def __init__(self):
+        """Initialize the database engine"""
+        env = getenv("HBNB_ENV")
+        
+        if env == 'test':
+            self.__engine = create_engine(
+                f"mysql+mysqldb://{getenv('HBNB_MYSQL_USER_TEST')}:{getenv('HBNB_MYSQL_PWD_TEST')}@"
+                f"{getenv('HBNB_MYSQL_HOST_TEST')}/{getenv('HBNB_MYSQL_DB_TEST')}",
+                pool_pre_ping=True
+            )
+        else:
+            self.__engine = create_engine(
+                f"mysql+mysqldb://{getenv('HBNB_MYSQL_USER_DEV')}:{getenv('HBNB_MYSQL_PWD_DEV')}@"
+                f"{getenv('HBNB_MYSQL_HOST_DEV')}/{getenv('HBNB_MYSQL_DB_DEV')}",
+                pool_pre_ping=True
+            )
+
+        # Drop all tables if the environment is "test"
+        if env == 'test':
+            Base.metadata.drop_all(self.__engine)
+
+import os
+from models.engine.db_storage import DBStorage
+from models.engine.file_storage import FileStorage
+
+# Load environment variables from .env file if not already loaded
+env = os.getenv('HBNB_ENV')  # 'test', 'development', or 'production'
+storage_type = os.getenv('HBNB_STORAGE_TYPE')  # 'db' or 'file'
+
+# Select the correct storage based on HBNB_STORAGE_TYPE
+if storage_type == 'db':
+    storage = DBStorage()
+else:
+    storage = FileStorage()
+
+# Check the environment and behave accordingly
+if env == 'test':
+    # Setup for test environment: drop tables, use test-specific configurations
+    print("Running in test environment...")
+    # Code specific to testing
+elif env == 'development':
+    # Setup for development: enable debugging, logging, etc.
+    print("Running in development environment...")
+    # Code specific to development
+elif env == 'production':
+    # Setup for production: optimize performance, disable debugging
+    print("Running in production environment...")
+    # Code specific to production
+else:
+    print("Unknown environment. Defaulting to development settings.")
