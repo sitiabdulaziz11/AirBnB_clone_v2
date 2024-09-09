@@ -248,22 +248,49 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the destroy command """
         print("Destroys an individual instance of a class")
         print("[Usage]: destroy <className> <objectId>\n")
-
+    
+    def do_state(self, user_input):
+        """Prints the string representation of an instance based on the class"""
+        
+        args = user_input.split( )
+        if args:
+        # elif user_input or args[0] != "BaseModel":
+            if args[0] == "State":
+                # Retrieve all State objects from storage
+                instances = [str(obj) for obj in storage.all(State).values()]
+                if instances:
+                    print(instances)
+                else:
+                    print("** no instance found **")
+            else:
+                print("** class doesn't exist **")    
+    
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
         print_list = []
 
         if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
+            # args = args.split(' ')[0]  # remove possible trailing args
+            class_name = args.split(' ')[0]
+            # if args not in HBNBCommand.classes:
+            if class_name not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+            # Get all objects of the specified class
+            objects = storage.all(HBNBCommand.classes[class_name])
+            for obj in objects.values():
+                print_list.append(str(obj))
+            
+            # for k, v in storage._FileStorage__objects.items():
+            #     if k.split('.')[0] == args:
+            #         print_list.append(str(v))
         else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
+            # for k, v in storage._FileStorage__objects.items():
+            #     print_list.append(str(v))
+            # Get all objects if no class name is provided
+            objects = storage.all()
+            for obj in objects.values():
+                print_list.append(str(obj))
 
         print(print_list)
 

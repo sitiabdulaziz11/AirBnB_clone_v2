@@ -2,20 +2,20 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from os import getenv
 from models.base_model import Base
-# from models.user import User
-# from models.place import Place
+from dotenv import load_dotenv
+
+from models.user import User
+from models.place import Place
 from models.state import State
-# from models.city import City
-# from models.amenity import Amenity
-# from models.review import Review
+from models.city import City
+from models.amenity import Amenity
+from models.review import Review
 
-# from dotenv import load_dotenv
-
-# # Load environment variables from the .env file
-# load_dotenv()
+# Load environment variables from the .env file
+load_dotenv()
 
 # classes = [State, City, User, Place, Review, Amenity]
-classes = [State]
+classes = [State, City, Place, User, Amenity, Review]
 
 class DBStorage:
     __engine = None
@@ -38,13 +38,13 @@ class DBStorage:
         # Drop all tables if in test environmen
         if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
-        else:
-            # Attempt to create all tables
-            try:
-                Base.metadata.create_all(self.__engine)
-                print("Tables created successfully.")
-            except Exception as e:
-                print(f"Error creating tables: {e}")
+        # else:
+        #     # Attempt to create all tables
+        #     try:
+        #         Base.metadata.create_all(self.__engine)
+        #         print("Tables created successfully.")
+        #     except Exception as e:
+        #         print(f"Error creating tables: {e}")
         
     def all(self, cls=None):
         """Returns a dictionary of models in the database
@@ -82,7 +82,14 @@ class DBStorage:
         """Creates all tables in the database and starts
         a new session.
         """
-        Base.metadata.create_all(self.__engine)
+        # Attempt to create all tables
+        try:
+            Base.metadata.create_all(self.__engine)
+            print("Tables created successfully.")
+        except Exception as e:
+            print(f"Error creating tables: {e}")
+        
+        # Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
