@@ -120,12 +120,16 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, args):
-        """ Create an object of any class"""
+        """ Create an object of any class
+        """
+        
         ignored_attrs = ('id', 'created_at', 'updated_at', '__class__')
         class_name = ''
         name_pattern = r'(?P<name>(?:[a-zA-Z]|_)(?:[a-zA-Z]|\d|_)*)'
         class_match = re.match(name_pattern, args)
         obj_kwargs = {}
+        
+        # Extract class name
         if class_match is not None:
             class_name = class_match.group('name')
             params_str = args[len(class_name):].strip()
@@ -139,6 +143,7 @@ class HBNBCommand(cmd.Cmd):
                 float_pattern,
                 int_pattern
             )
+            # Parse each parameter
             for param in params:
                 param_match = re.fullmatch(param_pattern, param)
                 if param_match is not None:
@@ -146,6 +151,8 @@ class HBNBCommand(cmd.Cmd):
                     str_var = param_match.group('typ_str')
                     float_var = param_match.group('typ_float')
                     int_var = param_match.group('typ_int')
+                    
+                    # Convert and store the parameter value
                     if float_var is not None:
                         obj_kwargs[key_name] = float(float_var)
                     if int_var is not None:
@@ -154,6 +161,8 @@ class HBNBCommand(cmd.Cmd):
                         obj_kwargs[key_name] = str_var[1:-1].replace('_', ' ')
         else:
             class_name = args
+        
+        # Error handling for missing class name or invalid class
         if not class_name:
             print("** class name missing **")
             return
@@ -171,6 +180,7 @@ class HBNBCommand(cmd.Cmd):
             new_instance.save()
             print(new_instance.id)
         else:
+            # Create the new instance with the parsed attributes
             new_instance = HBNBCommand.classes[class_name]()
             for key, value in obj_kwargs.items():
                 if key not in ignored_attrs:
@@ -217,7 +227,8 @@ class HBNBCommand(cmd.Cmd):
         print("[Usage]: show <className> <objectId>\n")
 
     def do_destroy(self, args):
-        """ Destroys a specified object """
+        """ Destroys a specified object
+        """
         new = args.partition(" ")
         c_name = new[0]
         c_id = new[2]
@@ -249,48 +260,49 @@ class HBNBCommand(cmd.Cmd):
         print("Destroys an individual instance of a class")
         print("[Usage]: destroy <className> <objectId>\n")
     
-    def do_state(self, user_input):
-        """Prints the string representation of an instance based on the class"""
+    # def do_state(self, user_input):
+    #     """Prints the string representation of an instance based on the class"""
         
-        args = user_input.split( )
-        if args:
-        # elif user_input or args[0] != "BaseModel":
-            if args[0] == "State":
-                # Retrieve all State objects from storage
-                instances = [str(obj) for obj in storage.all(State).values()]
-                if instances:
-                    print(instances)
-                else:
-                    print("** no instance found **")
-            else:
-                print("** class doesn't exist **")    
+    #     args = user_input.split( )
+    #     if args:
+    #     # elif user_input or args[0] != "BaseModel":
+    #         if args[0] == "State":
+            #     # Retrieve all State objects from storage
+            #     instances = [str(obj) for obj in storage.all(State).values()]
+            #     if instances:
+            #         print(instances)
+            #     else:
+            #         print("** no instance found **")
+            # else:
+            #     print("** class doesn't exist **")    
     
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
         print_list = []
 
         if args:
-            # args = args.split(' ')[0]  # remove possible trailing args
-            class_name = args.split(' ')[0]
-            # if args not in HBNBCommand.classes:
-            if class_name not in HBNBCommand.classes:
+            args = args.split(' ')[0]  # remove possible trailing args
+            # class_name = args.split(' ')[0]
+            if args not in HBNBCommand.classes:
+            # if class_name not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
             # Get all objects of the specified class
-            objects = storage.all(HBNBCommand.classes[class_name])
-            for obj in objects.values():
-                print_list.append(str(obj))
-            
-            # for k, v in storage._FileStorage__objects.items():
-            #     if k.split('.')[0] == args:
-            #         print_list.append(str(v))
+            # objects = storage.all(HBNBCommand.classes[class_name])
+            # for obj in objects.values():
+            #     print_list.append(str(obj))
+            for k, v in storage._FileStorage__objects.items():
+                if k.split('.')[0] == args:
+                    print_list.append(str(v))
         else:
-            # for k, v in storage._FileStorage__objects.items():
-            #     print_list.append(str(v))
+            for k, v in storage._FileStorage__objects.items():
+                print_list.append(str(v))
             # Get all objects if no class name is provided
-            objects = storage.all()
-            for obj in objects.values():
-                print_list.append(str(obj))
+
+            # Display the objects retrieved.
+            # objects = storage.all()
+            # for obj in objects.values():
+            #     print_list.append(str(obj))
 
         print(print_list)
 
