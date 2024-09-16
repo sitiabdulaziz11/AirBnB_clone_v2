@@ -125,24 +125,28 @@ class HBNBCommand(cmd.Cmd):
         
         ignored_attrs = ('id', 'created_at', 'updated_at', '__class__')
         class_name = ''
+        obj_kwargs = {}
+        
+        # Regular expression to extract class name
         name_pattern = r'(?P<name>(?:[a-zA-Z]|_)(?:[a-zA-Z]|\d|_)*)'
         class_match = re.match(name_pattern, args)
-        obj_kwargs = {}
         
         # Extract class name
         if class_match is not None:
             class_name = class_match.group('name')
             params_str = args[len(class_name):].strip()
             params = params_str.split(' ')
+            
+            # Define patterns to match different data types
             str_pattern = r'(?P<typ_str>"([^"]|\")*")'
             float_pattern = r'(?P<typ_float>[-+]?\d+\.\d+)'
             int_pattern = r'(?P<typ_int>[-+]?\d+)'
+            
+            # Combine the patterns into a parameter pattern
             param_pattern = '{}=({}|{}|{})'.format(
-                name_pattern,
-                str_pattern,
-                float_pattern,
-                int_pattern
+                name_pattern, str_pattern, float_pattern, int_pattern
             )
+            
             # Parse each parameter
             for param in params:
                 param_match = re.fullmatch(param_pattern, param)
@@ -152,41 +156,48 @@ class HBNBCommand(cmd.Cmd):
                     float_var = param_match.group('typ_float')
                     int_var = param_match.group('typ_int')
                     
-                    # Convert and store the parameter value
+                    # Store the parameter value in obj_kwargs
                     if float_var is not None:
                         obj_kwargs[key_name] = float(float_var)
-                    if int_var is not None:
+                    elif int_var is not None:
                         obj_kwargs[key_name] = int(int_var)
-                    if str_var is not None:
+                    elif str_var is not None:
                         obj_kwargs[key_name] = str_var[1:-1].replace('_', ' ')
+            
+            # Ensure 'name' is present and not None
+            if 'name' not in obj_kwargs or obj_kwargs['name'] == "":
+                print("** name parameter is missing or invalid **")
+                return
         else:
-            class_name = args
-        
-        # Error handling for missing class name or invalid class
-        if not class_name:
             print("** class name missing **")
             return
-        elif class_name not in HBNBCommand.classes:
+        
+        # Error handling for invalid class name
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
+        
+        # Create the object and handle database storage
         if os.getenv('HBNB_TYPE_STORAGE') == 'db':
-            if not hasattr(obj_kwargs, 'id'):
-                obj_kwargs['id'] = str(uuid.uuid4())
-            if not hasattr(obj_kwargs, 'created_at'):
-                obj_kwargs['created_at'] = str(datetime.now())
-            if not hasattr(obj_kwargs, 'updated_at'):
-                obj_kwargs['updated_at'] = str(datetime.now())
+            # Set default values for 'id', 'created_at', 'updated_at'
+            obj_kwargs['id'] = str(uuid.uuid4())
+            obj_kwargs['created_at'] = datetime.now()
+            obj_kwargs['updated_at'] = datetime.now()
+            
+            # Create instance with the given attributes
             new_instance = HBNBCommand.classes[class_name](**obj_kwargs)
             new_instance.save()
             print(new_instance.id)
         else:
-            # Create the new instance with the parsed attributes
+            # For file storage, create the new instance
             new_instance = HBNBCommand.classes[class_name]()
             for key, value in obj_kwargs.items():
                 if key not in ignored_attrs:
                     setattr(new_instance, key, value)
             new_instance.save()
             print(new_instance.id)
+
+
 
     def help_create(self):
         """ Help information for the create method """
@@ -288,21 +299,21 @@ class HBNBCommand(cmd.Cmd):
                 print("** class doesn't exist **")
                 return
             # Get all objects of the specified class
-            # objects = storage.all(HBNBCommand.classes[class_name])
-            # for obj in objects.values():
-            #     print_list.append(str(obj))
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+            objects = storage.all(HBNBCommand.classes[args])
+            for obj in objects.values():
+                print_list.append(str(obj))
+            # for k, v in storage._FileStorage__objects.items():
+                # if k.split('.')[0] == args:
+                    # print_list.append(str(v))
         else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
+            # for k, v in storage._FileStorage__objects.items():
+                # print_list.append(str(v))
             # Get all objects if no class name is provided
 
             # Display the objects retrieved.
-            # objects = storage.all()
-            # for obj in objects.values():
-            #     print_list.append(str(obj))
+            objects = storage.all()
+            for obj in objects.values():
+                print_list.append(str(obj))
 
         print(print_list)
 

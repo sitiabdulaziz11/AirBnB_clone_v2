@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from os import getenv
-from models.base_model import Base
 from dotenv import load_dotenv
 
+from models.base_model import Base
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -28,7 +28,6 @@ class DBStorage:
         # pwd = getenv('HBNB_MYSQL_PWD')
         # host = getenv('HBNB_MYSQL_HOST')
         # db = getenv('HBNB_MYSQL_DB')
-        
         # self.__engine = create_engine(
         #     f"mysql+mysqldb://{user}:{pwd}@{host}/{db}", pool_pre_ping=True) or below
         
@@ -65,6 +64,8 @@ class DBStorage:
     def new(self, obj):
         """Adds a new object to the database
         """
+        # name = ...
+        # print("Name:", state.name)
         self.__session.add(obj)
 
     def save(self):
@@ -77,6 +78,7 @@ class DBStorage:
         """
         if obj:
             self.__session.delete(obj)
+            # session.commit() # Make the deletion permanent
 
     def reload(self):
         """Creates all tables in the database and starts

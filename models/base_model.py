@@ -35,23 +35,45 @@ class BaseModel:
         else:
             if 'id' in kwargs:
                 self.id = kwargs['id']
-            else:
-                self.id = str(uuid.uuid4())
                 
+            # if 'created_at' in kwargs:
+            #     self.created_at = datetime.strptime(kwargs['created_at'], '%Y-%m-%d %H:%M:%S.%f')
+            
             if 'created_at' in kwargs:
-                self.created_at = datetime.strptime(kwargs['created_at'], '%Y-%m-%dT%H:%M:%S.%f')
+                if isinstance(kwargs['created_at'], str):
+                    self.created_at = datetime.strptime(kwargs['created_at'], '%Y-%m-%d %H:%M:%S.%f')
+                elif isinstance(kwargs['created_at'], datetime):
+                    self.created_at = kwargs['created_at']
+                else:
+                    self.created_at = datetime.now()  # Default to current time if neither
             else:
                 self.created_at = datetime.now()
-
+                        
+            # if 'updated_at' in kwargs:
+            #     self.updated_at = datetime.strptime(kwargs['updated_at'], '%Y-%m-%d %H:%M:%S.%f')
+            
             if 'updated_at' in kwargs:
-                self.updated_at = datetime.strptime(kwargs['updated_at'], '%Y-%m-%dT%H:%M:%S.%f')
+                if isinstance(kwargs['updated_at'], str):
+                    self.updated_at = datetime.strptime(kwargs['updated_at'], '%Y-%m-%d %H:%M:%S.%f')
+                elif isinstance(kwargs['updated_at'], datetime):
+                    self.updated_at = kwargs['updated_at']
+                else:
+                    self.updated_at = datetime.now()  # Default to current time if neither
             else:
                 self.updated_at = datetime.now()
 
             # Iterate over kwargs to set instance attribute
             for key, value in kwargs.items():
                 if key == 'updated_at' or key == 'created_at':
-                    value = datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f')
+                    if isinstance(value, str):
+                        value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S.%f')
+                    elif isinstance(value, datetime):
+                        pass  # Value is already a datetime, no need to convert
+                    else:
+                        value = datetime.now()  # Handle if value is neither a string nor a datetime
+                    setattr(self, key, value)  # Set the attribute for 'created_at' or 'updated_at'
+                else:
+                    setattr(self, key, value)  # For other keys, directly assign the value
                     
                     # Use hasattr to check if attribute already exists
                 if not hasattr(self, key) and key != '__class__':
@@ -80,8 +102,19 @@ class BaseModel:
         """Convert instance into dict format"""
         dictionary = {}
         dictionary.update(self.__dict__)
+        # Remove _sa_instance_state if it exists
+        if '_sa_instance_state' in dictionary:
+            del dictionary['_sa_instance_state']
+        
         dictionary.update({'__class__':
                           (str(type(self)).split('.')[-1]).split('\'')[0]})
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
         return dictionary
+    
+    def delete(self):
+        """ Delete the current instance from the storage
+        """
+        from models import storage
+        storage.delete(self)
+        # storage.save()
