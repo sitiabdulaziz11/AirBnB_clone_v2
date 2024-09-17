@@ -165,9 +165,9 @@ class HBNBCommand(cmd.Cmd):
                         obj_kwargs[key_name] = str_var[1:-1].replace('_', ' ')
             
             # Ensure 'name' is present and not None
-            if 'name' not in obj_kwargs or obj_kwargs['name'] == "":
-                print("** name parameter is missing or invalid **")
-                return
+            # if 'name' not in obj_kwargs or obj_kwargs['name'] == "":
+            #     # print("** name parameter is missing or invalid **")
+            #     return
         else:
             print("** class name missing **")
             return
@@ -195,8 +195,8 @@ class HBNBCommand(cmd.Cmd):
                 if key not in ignored_attrs:
                     setattr(new_instance, key, value)
             new_instance.save()
+            # storage.save()
             print(new_instance.id)
-
 
 
     def help_create(self):
@@ -205,7 +205,8 @@ class HBNBCommand(cmd.Cmd):
         print("[Usage]: create <className>\n")
 
     def do_show(self, args):
-        """ Method to show an individual object """
+        """ Method to show an individual object
+        """
         new = args.partition(" ")
         c_name = new[0]
         c_id = new[2]
