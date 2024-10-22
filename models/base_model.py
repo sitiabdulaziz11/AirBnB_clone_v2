@@ -1,17 +1,20 @@
 #!/usr/bin/python3
+# shebang used for Direct Execution and  to specify the exact version of Python (e.g., Python 3) which is used for avoiding compatibility issues.
 """This module defines a base class for all models in our hbnb clone
 """
 
 import uuid
 from os import getenv
-from dateutil import parser
+# from dateutil import parser
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime
 
 
 if getenv("HBNB_TYPE_STORAGE") == "db":
-    Base = declarative_base()
+    Base = declarative_base() # used for mapping Python classes to database tables, to track the tables, columns, and relationships defined in the model
+    # used for automatic table creation, schema management, and interaction with the database.
+    # by useing the Base.metadata.create_all() method to create the actual tables in the database.
 else:
     Base = object
     

@@ -37,6 +37,8 @@ def do_pack():
     return result
 
 
+# not work with fabric 3.x
+
 def do_deploy(archive_path):
     """Fabric script that distributes an archive to my
     web servers using the do_deploy function

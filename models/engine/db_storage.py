@@ -18,8 +18,8 @@ load_dotenv()
 classes = [State, City, Place, User, Amenity, Review]
 
 class DBStorage:
-    __engine = None
-    __session = None
+    __engine = None  #  responsible for managing the connection to the database.
+    __session = None # represents an intermediary between the Python code and the database.
 
     def __init__(self):
         """Initialize the database engine
@@ -78,7 +78,7 @@ class DBStorage:
         """
         if obj:
             self.__session.delete(obj)
-            # session.commit() # Make the deletion permanent
+            self.session.commit() # Make the deletion permanent
 
     def reload(self):
         """Creates all tables in the database and starts

@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+
+# not working with fabric 2.x , only for fabric 1.x
+
 """
 A  Fabric script that generates a .tgz archive from the contents of the
 web_static folder of your AirBnB Clone repo, using the function do_pack.
