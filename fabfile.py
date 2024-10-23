@@ -9,6 +9,7 @@ from fabric import task, Connection
 from datetime import datetime
 import os
 import subprocess
+from fabric.api import env, run, put
 
 
 @task
@@ -101,3 +102,18 @@ def do_deploy(c, archive_path):
     except Exception as e:
         print(f"Error: {e}")
         return False
+
+env.key_filename = '/path/to/my_ssh_private_key'  # Specify the private key file
+# env.key_filename is a built-in configuration variable provided by Fabric
+
+env.user = 'ubuntu' # for user also possible
+
+
+def deploy():
+    """Creates and deploys the archive to the servers.
+    """
+    archive_path = do_pack()
+    if not archive_path:
+        return False
+
+    return do_deploy(archive_path)
