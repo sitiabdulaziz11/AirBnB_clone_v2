@@ -45,7 +45,7 @@ class DBStorage:
         #     except Exception as e:
         #         print(f"Error creating tables: {e}")
         
-    def all(self, cls=None):
+    def get_all(self, cls=None):
         """Returns a dictionary of models in the database
         """
         objs = {}
@@ -99,5 +99,4 @@ class DBStorage:
     def close(self):
         """Closes the database session
         """
-        self.__session.remove()
-        
+        self.__session.close()
