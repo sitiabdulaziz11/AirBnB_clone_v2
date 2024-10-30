@@ -100,3 +100,9 @@ class DBStorage:
         """Closes the database session
         """
         self.__session.close()
+    
+    def get_by_id(self, cls, id):
+        """
+        Retrieve an object by its ID from the given class.
+        """
+        return self.__session.query(cls).get(id)

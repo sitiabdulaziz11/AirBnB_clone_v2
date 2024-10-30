@@ -93,3 +93,77 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2017-03-25 19:42:51
+
+
+DROP TABLE IF EXISTS `users`;
+
+
+CREATE TABLE `users` (
+  `id` VARCHAR(60) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `email` VARCHAR(128) NOT NULL,
+  `password` VARCHAR(128) NOT NULL,
+  `first_name` VARCHAR(128),
+  `last_name` VARCHAR(128),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `places`;
+
+CREATE TABLE `places` (
+  `id` VARCHAR(60) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `city_id` VARCHAR(60) NOT NULL,
+  `user_id` VARCHAR(60) NOT NULL,
+  `name` VARCHAR(128) NOT NULL,
+  `description` VARCHAR(1024),
+  `number_rooms` INT DEFAULT 0,
+  `number_bathrooms` INT DEFAULT 0,
+  `max_guest` INT DEFAULT 0,
+  `price_by_night` INT DEFAULT 0,
+  `latitude` FLOAT,
+  `longitude` FLOAT,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`city_id`) REFERENCES `cities`(`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+DROP TABLE IF EXISTS `reviews`;
+
+CREATE TABLE `reviews` (
+  `id` VARCHAR(60) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `place_id` VARCHAR(60) NOT NULL,
+  `user_id` VARCHAR(60) NOT NULL,
+  `text` VARCHAR(1024) NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`place_id`) REFERENCES `places`(`id`),
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `amenities`;
+
+CREATE TABLE `amenities` (
+  `id` VARCHAR(60) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `name` VARCHAR(128) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `place_amenity`;
+
+
+CREATE TABLE `place_amenity` (
+  `place_id` VARCHAR(60) NOT NULL,
+  `amenity_id` VARCHAR(60) NOT NULL,
+  PRIMARY KEY (`place_id`, `amenity_id`),
+  FOREIGN KEY (`place_id`) REFERENCES `places`(`id`),
+  FOREIGN KEY (`amenity_id`) REFERENCES `amenities`(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+

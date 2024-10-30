@@ -17,16 +17,28 @@ app = Flask(__name__)
 # logger = logging.getLogger(__name__)  # Create a logger for this module
 
 
-@app.route('/cities_by_states', strict_slashes=False)
-def cities_by_states():
+@app.route('/states', strict_slashes=False)
+def states():
     """ Function that loads all states and their cities.
     """
-    # states = storage.get_all(State).cities
     states = sorted(storage.get_all(State).values(), key=lambda state: state.name)
-    for state in states:
-        state.cities = sorted(state.cities, key=lambda city: city.name)
+    # city = sorted(states.cities, key=lambda city: city.name)
+    return render_template('9-states.html', states1=states)
+    # return render_template('8-cities_by_states.html', states1=states, city1=city)
 
-    return render_template('8-cities_by_states.html', states1=states)
+
+@app.route('/states/<id>', strict_slashes=False)
+def states_cities(id):
+    """ Function that loads specific state and its cities.
+    """
+    state = storage.get_by_id(State, id)
+    # print(state)
+    
+    if state:
+        cities = sorted(state.cities, key=lambda  city: city.name)
+        return render_template('9-states.html', state1=state, cities1=cities)
+    else:
+        return render_template('9-states.html', state1=None)
 
 
 @app.teardown_appcontext
